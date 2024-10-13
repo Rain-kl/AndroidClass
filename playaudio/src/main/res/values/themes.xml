@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.AndroidClass" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="android:fontFamily">@font/ping_fang_medium</item>
+
+        <item name="colorPrimary">@color/custom_primary</item>
+        <item name="colorPrimaryVariant">@color/custom_primary_variant</item>
+        <item name="colorOnPrimary">@color/custom_on_primary</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/custom_secondary</item>
+        <item name="colorSecondaryVariant">@color/custom_secondary_variant</item>
+        <item name="colorOnSecondary">@color/custom_on_secondary</item>
+    </style>
+
+
+    <style name="Theme.AndroidClass" parent="Base.Theme.AndroidClass" />
+</resources>
