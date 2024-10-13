@@ -36,6 +36,7 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/btn_scan_music"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:text="@string/scanMusic"
