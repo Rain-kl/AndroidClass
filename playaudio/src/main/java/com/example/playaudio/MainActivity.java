@@ -153,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         findViewById(R.id.btn_scan_music).setOnClickListener(this);
+        findViewById(R.id.btn_search_music).setOnClickListener(this);
 
         preferences = getSharedPreferences("config", MODE_PRIVATE);
         String uriString = preferences.getString("uri", null);
@@ -182,6 +183,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         int viewId = view.getId();
         if (viewId == R.id.btn_scan_music) {
+            openDirectoryChooser();
+        }
+        if (viewId == R.id.btn_search_music) {
             openDirectoryChooser();
         }
     }

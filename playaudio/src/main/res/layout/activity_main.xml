@@ -17,6 +17,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:contentDescription="TODO"
             android:src="@drawable/ic_menu" />
 
         <TextView
@@ -28,6 +29,7 @@
             android:textSize="18sp" />
 
         <ImageView
+            android:id="@+id/btn_search_music"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:contentDescription="@string/search_music"
