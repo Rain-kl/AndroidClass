@@ -100,94 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void loadMusicFiles(Context context, Uri uri) throws IOException {
-        // Initialize RecyclerView
-        recyclerView = findViewById(R.id.music_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Clear the existing list if any
-        musicList.clear();
-
-        // 使用DocumentFile从树Uri中获取DocumentFile对象
-        DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
-
-        // 确保DocumentFile对象不为空并确认是一个目录
-        if (documentFile != null && documentFile.isDirectory()) {
-            // 列出目录下所有文件
-            for (DocumentFile file : documentFile.listFiles()) {
-                // 检查文件是否是音乐文件
-                if (file.isFile()) {
-                    String mimeType = file.getType();
-                    if (mimeType != null && (mimeType.equals("audio/mpeg") || mimeType.equals("audio/mp3"))) {
-                        // 使用MediaMetadataRetriever获取音频文件的元数据
-                        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-
-                        try {
-                            mmr.setDataSource(context, file.getUri());
-
-                            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                            Uri musicUri = file.getUri();
-
-                            if (title == null) title = "Unknown Title";
-                            if (artist == null) artist = "Unknown Artist";
-
-                            Log.i("MusicFile", "Music File: " + file.getName() + ", Title: " + title + ", Artist: " + artist);
-                            MusicBaseModel music = new MusicBaseModel(title, artist, musicUri);
-                            musicList.add(music);
-                        } catch (IllegalArgumentException e) {
-                            Log.e("Error", "Failed to retrieve metadata for " + file.getName() + ": " + e.getMessage());
-                        } finally {
-                            mmr.release();
-                        }
-                    }
-                }
-            }
-        } else {
-            Log.e("Error", "The Uri does not represent a valid directory or is null.");
-        }
-        // Update adapter
-        musicAdapter = new MusicAdapter(musicList, this::playMusic);
-        recyclerView.setAdapter(musicAdapter);
-    }
-
-    private void playMusic(MusicBaseModel music) {
-        // 记录Uri用于调试
-        Log.d("MusicUri", "Music Uri: " + music.getUri().toString());
-        Toast.makeText(this, "You clicked on: " + music.getTitle(), Toast.LENGTH_SHORT).show();
-
-        ContentResolver contentResolver = getContentResolver();
-        try {
-            if (mediaPlayer != null) {
-                mediaPlayer.release(); // 释放旧的MediaPlayer资源
-                mediaPlayer = null;
-            }
-
-            AssetFileDescriptor fileDescriptor = contentResolver.openAssetFileDescriptor(music.getUri(), "r");
-            if (fileDescriptor != null) {
-                // 创建新的MediaPlayer实例
-                mediaPlayer = new MediaPlayer();
-                mediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
-                fileDescriptor.close();
-
-                mediaPlayer.setOnPreparedListener(mp -> mediaPlayer.start());
-                mediaPlayer.setOnCompletionListener(mp -> {
-                    mp.release();
-                    Toast.makeText(this, "Playback completed", Toast.LENGTH_SHORT).show();
-                });
-                mediaPlayer.setOnErrorListener((mp, what, extra) -> {
-                    Toast.makeText(this, "Error playing music", Toast.LENGTH_SHORT).show();
-                    mp.release();
-                    return true;
-                });
-
-                mediaPlayer.prepareAsync();
-            }
-        } catch (IOException e) {
-//                e.printStackTrace();
-            Toast.makeText(this, "Unable to play music", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,12 +112,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return insets;
         });
 
-        // 检查并请求通知权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
-            }
-        }
+//        // 检查并请求通知权限
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
+//            }
+//        }
 
         findViewById(R.id.btn_scan_music).setOnClickListener(this);
         findViewById(R.id.btn_search_music).setOnClickListener(this);
@@ -226,7 +138,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 openDirectoryChooser();
             }
             try {
-                loadMusicFiles(this, authorizedUri);
+                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
+                recyclerView = findViewById(R.id.music_recycler_view);
+                MusicHandler musicHandler = new MusicHandler(this, recyclerView);
+                musicHandler.loadMusicFiles(this,authorizedUri);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
