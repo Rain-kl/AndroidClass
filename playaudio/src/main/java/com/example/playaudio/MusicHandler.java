@@ -25,6 +25,7 @@ public class MusicHandler {
     private RecyclerView recyclerView;
     private MusicAdapter musicAdapter;
     private MediaPlayer mediaPlayer;
+    private MusicBaseModel currentlyPlayingMusic;
 
     public MusicHandler(Context context, RecyclerView recyclerView) {
         this.context = context;
@@ -86,18 +87,23 @@ public class MusicHandler {
         recyclerView.setAdapter(musicAdapter);
     }
 
-
     public void playMusic(MusicBaseModel music) {
         Log.d("MusicUri", "Music Uri: " + music.getUri().toString());
         Toast.makeText(context, "You clicked on: " + music.getTitle(), Toast.LENGTH_SHORT).show();
 
+        if (mediaPlayer != null && currentlyPlayingMusic == music) {
+            togglePlayPause();
+            return;
+        }
+
+        // If another song is playing, stop it
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+
         ContentResolver contentResolver = context.getContentResolver();
         try {
-            if (mediaPlayer != null) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
-
             AssetFileDescriptor fileDescriptor = contentResolver.openAssetFileDescriptor(music.getUri(), "r");
             if (fileDescriptor != null) {
                 mediaPlayer = new MediaPlayer();
@@ -116,10 +122,23 @@ public class MusicHandler {
                 });
 
                 mediaPlayer.prepareAsync();
+                currentlyPlayingMusic = music;
             }
         } catch (IOException e) {
             Toast.makeText(context, "Unable to play music", Toast.LENGTH_SHORT).show();
             Log.e("Error", "IOException while trying to play music: " + e.getMessage());
+        }
+    }
+
+    public void togglePlayPause() {
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+                Toast.makeText(context, "Music paused", Toast.LENGTH_SHORT).show();
+            } else {
+                mediaPlayer.start();
+                Toast.makeText(context, "Music resumed", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
