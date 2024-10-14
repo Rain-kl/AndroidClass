@@ -1,6 +1,5 @@
 package com.example.playaudio;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import java.util.List;
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
 
     private final List<MusicBaseModel> musicList;
-    private OnItemClickListener listener;
+    private final OnItemClickListener listener;
     private int selectedPosition = RecyclerView.NO_POSITION; // 默认没有选择
 
     public MusicAdapter(List<MusicBaseModel> musicList, OnItemClickListener listener) {
@@ -30,7 +29,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     @Override
     public MusicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_music, parent, false);
-        return new MusicViewHolder(view, listener);
+        return new MusicViewHolder(view);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         TextView titleTextView;
         TextView artistTextView;
 
-        MusicViewHolder(View itemView, OnItemClickListener listener) {
+        MusicViewHolder(View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.song_title);
             artistTextView = itemView.findViewById(R.id.artist);

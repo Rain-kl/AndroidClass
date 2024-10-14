@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicHandler {
-    private Context context;
-    private List<MusicBaseModel> musicList = new ArrayList<>();
-    private RecyclerView recyclerView;
+    private final Context context;
+    private final List<MusicBaseModel> musicList = new ArrayList<>();
+    private final RecyclerView recyclerView;
     private MusicAdapter musicAdapter;
     private MediaPlayer mediaPlayer;
     private MusicBaseModel currentlyPlayingMusic;
@@ -37,6 +37,7 @@ public class MusicHandler {
         this.recyclerView.setAdapter(musicAdapter);
     }
 
+    @SuppressWarnings("resource")
     public void loadMusicFiles(Uri uri) throws IOException {
         // Initialize RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -56,8 +57,8 @@ public class MusicHandler {
                     String mimeType = file.getType();
                     if (mimeType != null && (mimeType.equals("audio/mpeg") || mimeType.equals("audio/mp3"))) {
                         // 使用MediaMetadataRetriever获取音频文件的元数据
-                        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
 
+                        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                         try {
                             mmr.setDataSource(context, file.getUri());
 
@@ -72,6 +73,7 @@ public class MusicHandler {
                             MusicBaseModel music = new MusicBaseModel(title, artist, musicUri);
                             musicList.add(music);
                         } catch (IllegalArgumentException e) {
+//                            e.printStackTrace(); // 处理异常
                             Log.e("Error", "Failed to retrieve metadata for " + file.getName() + ": " + e.getMessage());
                         } finally {
                             mmr.release();

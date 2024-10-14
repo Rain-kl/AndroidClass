@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,11 +26,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.playaudio.model.MusicBaseModel;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,11 +35,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static Uri authorizedUri; // 用来存储已授权的URI
 
     private SharedPreferences preferences;
-
-    private RecyclerView recyclerView;
-    private MusicAdapter musicAdapter;
-    private List<MusicBaseModel> musicList = new ArrayList<>(); // Dummy data for testing
-    private MediaPlayer mediaPlayer;
 
 
     private final ActivityResultLauncher<Intent> openDirectoryLauncher =
@@ -134,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             try {
 //                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
-                recyclerView = findViewById(R.id.music_recycler_view);
+                RecyclerView recyclerView = findViewById(R.id.music_recycler_view);
                 MusicHandler musicHandler = new MusicHandler(this, recyclerView);
                 musicHandler.loadMusicFiles(authorizedUri);
             } catch (IOException e) {
