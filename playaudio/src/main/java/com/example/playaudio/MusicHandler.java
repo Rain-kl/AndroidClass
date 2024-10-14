@@ -36,7 +36,7 @@ public class MusicHandler {
         this.recyclerView.setAdapter(musicAdapter);
     }
 
-    public void loadMusicFiles(Context context, Uri uri) throws IOException {
+    public void loadMusicFiles(Uri uri) throws IOException {
         // Initialize RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 

@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -112,36 +113,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return insets;
         });
 
-//        // 检查并请求通知权限
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
-//            }
-//        }
+        // 检查并请求通知权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
+            }
+        }
 
         findViewById(R.id.btn_scan_music).setOnClickListener(this);
         findViewById(R.id.btn_search_music).setOnClickListener(this);
 
+
         preferences = getSharedPreferences("config", MODE_PRIVATE);
         String uriString = preferences.getString("uri", null);
 
-        if (uriString == null) {
+        if (uriString == null) {  // 如果没有存储的URI，则显示扫描音乐按钮
             findViewById(R.id.btn_scan_music).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.btn_scan_music).setVisibility(View.GONE);
             authorizedUri = Uri.parse(uriString);
-            if (hasUriPermission(authorizedUri)) {
+            if (hasUriPermission(authorizedUri)) {  // 如果有存储的URI且有权限，则加载音乐文件
                 Log.d("MainActivity", "Permission granted for: " + authorizedUri.toString());
 //                Toast.makeText(this, "Permission granted for: " + authorizedUri.toString(), Toast.LENGTH_SHORT).show();
-            } else {
+            } else {  // 如果有存储的URI但是没有权限，则提示用户重新选择目录
                 Toast.makeText(this, "Permission expired for: " + authorizedUri.toString(), Toast.LENGTH_LONG).show();
                 openDirectoryChooser();
             }
             try {
-                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
+//                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
                 recyclerView = findViewById(R.id.music_recycler_view);
                 MusicHandler musicHandler = new MusicHandler(this, recyclerView);
-                musicHandler.loadMusicFiles(this,authorizedUri);
+                musicHandler.loadMusicFiles(authorizedUri);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
