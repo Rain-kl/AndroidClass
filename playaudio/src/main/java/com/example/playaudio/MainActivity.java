@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SharedPreferences preferences;
 
-
+    //
     private final ActivityResultLauncher<Intent> openDirectoryLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -50,15 +50,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             getContentResolver().takePersistableUriPermission(
                                     uri,
                                     Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            );
-                            Toast.makeText(MainActivity.this, "You selected: " + uri, Toast.LENGTH_LONG).show();
+                            );  // 授予永久权限
+                            Toast.makeText(MainActivity.this, "You selected: " + uri, Toast.LENGTH_LONG).show();  // 提示用户选择的目录
                             authorizedUri = uri;
+                            // 保存URI
                             preferences = getSharedPreferences("config", MODE_PRIVATE);
                             SharedPreferences.Editor editor = preferences.edit();
                             editor.putString("uri", uri.toString());
                             editor.apply();
 
-                            // Restart or refresh the activity to reflect the changes
+                            // 重启Activity
                             Intent restartIntent = new Intent(MainActivity.this, MainActivity.class);
                             finish();  // Close the current activity
                             startActivity(restartIntent);  // Start a new instance of MainActivity
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
 
+    // 检查是否已授予权限
     private boolean hasUriPermission(Uri uri) {
         for (UriPermission persistedUri : getContentResolver().getPersistedUriPermissions()) {
             if (persistedUri.getUri().equals(uri) && persistedUri.isReadPermission() && persistedUri.isWritePermission()) {
@@ -77,11 +79,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return false;
     }
 
+    // 打开目录选择器, 用于选择音乐文件的目录
     public void openDirectoryChooser() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         openDirectoryLauncher.launch(intent);
         Toast.makeText(this, "Please select a directory", Toast.LENGTH_LONG).show();
-
     }
 
 
@@ -96,17 +98,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return insets;
         });
 
-        // 检查并请求通知权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
-            }
-        }
 
         findViewById(R.id.btn_scan_music).setOnClickListener(this);
         findViewById(R.id.btn_search_music).setOnClickListener(this);
 
-
+        // 获取存储的URI，如果没有存储的URI，则显示扫描音乐按钮
         preferences = getSharedPreferences("config", MODE_PRIVATE);
         String uriString = preferences.getString("uri", null);
 
@@ -120,13 +116,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                Toast.makeText(this, "Permission granted for: " + authorizedUri.toString(), Toast.LENGTH_SHORT).show();
             } else {  // 如果有存储的URI但是没有权限，则提示用户重新选择目录
                 Toast.makeText(this, "Permission expired for: " + authorizedUri.toString(), Toast.LENGTH_LONG).show();
-                openDirectoryChooser();
+                openDirectoryChooser();  // 打开目录选择器，授权新的目录
             }
+            // 加载音乐文件
             try {
 //                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
                 RecyclerView recyclerView = findViewById(R.id.music_recycler_view);
-                MusicHandler musicHandler = new MusicHandler(this, recyclerView);
-                musicHandler.loadMusicFiles(authorizedUri);
+                MusicHandler musicHandler = new MusicHandler(this, recyclerView);  // 创建音乐处理器
+                musicHandler.loadMusicFiles(authorizedUri);  // 加载音乐文件
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -19,30 +19,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// 音乐播放与展示的类
 public class MusicHandler {
     private final Context context;
     private final List<MusicBaseModel> musicList = new ArrayList<>();
     private final RecyclerView recyclerView;
-    private MusicAdapter musicAdapter;
     private MediaPlayer mediaPlayer;
     private MusicBaseModel currentlyPlayingMusic;
 
     public MusicHandler(Context context, RecyclerView recyclerView) {
         this.context = context;
         this.recyclerView = recyclerView;
-
-        // Setup the RecyclerView
-        this.recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        this.musicAdapter = new MusicAdapter(musicList, this::playMusic);
-        this.recyclerView.setAdapter(musicAdapter);
     }
 
     @SuppressWarnings("resource")
     public void loadMusicFiles(Uri uri) throws IOException {
-        // Initialize RecyclerView
+        // 初始化RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        // Clear the existing list if any
+        // 清空音乐列表
         musicList.clear();
 
         // 使用DocumentFile从树Uri中获取DocumentFile对象
@@ -52,24 +47,27 @@ public class MusicHandler {
         if (documentFile != null && documentFile.isDirectory()) {
             // 列出目录下所有文件
             for (DocumentFile file : documentFile.listFiles()) {
-                // 检查文件是否是音乐文件
+                // 检查文件是否是文件
                 if (file.isFile()) {
                     String mimeType = file.getType();
+                    // 检查文件是否是音频文件
                     if (mimeType != null && (mimeType.equals("audio/mpeg") || mimeType.equals("audio/mp3"))) {
-                        // 使用MediaMetadataRetriever获取音频文件的元数据
 
+                        // 使用MediaMetadataRetriever获取音频文件的元数据
                         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
                         try {
+                            // 设置数据源
                             mmr.setDataSource(context, file.getUri());
-
-                            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                            Uri musicUri = file.getUri();
+                            // 提取元数据
+                            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);  // 提取标题
+                            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST); // 提取艺术家
+                            Uri musicUri = file.getUri(); // 获取音乐文件的URI
 
                             if (title == null) title = "Unknown Title";
                             if (artist == null) artist = "Unknown Artist";
 
                             Log.i("MusicFile", "Music File: " + file.getName() + ", Title: " + title + ", Artist: " + artist);
+
                             MusicBaseModel music = new MusicBaseModel(title, artist, musicUri);
                             musicList.add(music);
                         } catch (IllegalArgumentException e) {
@@ -84,8 +82,9 @@ public class MusicHandler {
         } else {
             Log.e("Error", "The Uri does not represent a valid directory or is null.");
         }
-        // Update adapter
-        musicAdapter = new MusicAdapter(musicList, this::playMusic);
+        // 创建音乐适配器
+        MusicAdapter musicAdapter = new MusicAdapter(musicList, this::playMusic);
+        // 设置适配器
         recyclerView.setAdapter(musicAdapter);
     }
 
@@ -93,26 +92,28 @@ public class MusicHandler {
         Log.d("MusicUri", "Music Uri: " + music.getUri().toString());
         Toast.makeText(context, "You clicked on: " + music.getTitle(), Toast.LENGTH_SHORT).show();
 
-        if (mediaPlayer != null && currentlyPlayingMusic == music) {
-            togglePlayPause();
-            return;
-        }
 
-        // If another song is playing, stop it
+        // 如果有音乐正在播放，则释放MediaPlayer
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
         }
 
+        // 创建MediaPlayer并设置数据源
         ContentResolver contentResolver = context.getContentResolver();
         try {
+            // 打开文件描述符
             AssetFileDescriptor fileDescriptor = contentResolver.openAssetFileDescriptor(music.getUri(), "r");
             if (fileDescriptor != null) {
+                // 创建MediaPlayer并设置数据源
                 mediaPlayer = new MediaPlayer();
+                // 设置数据源
                 mediaPlayer.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getLength());
+                // 关闭文件描述符
                 fileDescriptor.close();
 
-                mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+                // 设置监听器, 当准备好时开始播放
+                mediaPlayer.setOnPreparedListener(MediaPlayer::start);  //使用lambda表达式，当准备好时开始播放
                 mediaPlayer.setOnCompletionListener(mp -> {
                     mp.release();
                     Toast.makeText(context, "Playback completed", Toast.LENGTH_SHORT).show();
@@ -132,15 +133,4 @@ public class MusicHandler {
         }
     }
 
-    public void togglePlayPause() {
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
-                Toast.makeText(context, "Music paused", Toast.LENGTH_SHORT).show();
-            } else {
-                mediaPlayer.start();
-                Toast.makeText(context, "Music resumed", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 }

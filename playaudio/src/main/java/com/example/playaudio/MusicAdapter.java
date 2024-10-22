@@ -34,9 +34,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
     @Override
     public void onBindViewHolder(MusicViewHolder holder, int position) {
-        MusicBaseModel music = musicList.get(position);
-        holder.titleTextView.setText(music.getTitle());
-        holder.artistTextView.setText(music.getArtist());
+        MusicBaseModel music = musicList.get(position);  // 获取当前位置的音乐
+        holder.titleTextView.setText(music.getTitle());  // 展示音乐标题
+        holder.artistTextView.setText(music.getArtist()); // 展示音乐艺术家
 
         // 改变选定项目标题的字体颜色
         int color = (position == selectedPosition) ?
@@ -46,16 +46,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         holder.titleTextView.setTextColor(color);
         holder.artistTextView.setTextColor(color);
 
-
+        // 设置点击事件
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 int previousPosition = selectedPosition;
                 selectedPosition = holder.getAdapterPosition();
 
-                notifyItemChanged(previousPosition);
-                notifyItemChanged(selectedPosition);
+                notifyItemChanged(previousPosition);  // 通知适配器更新前一个选定项目
+                notifyItemChanged(selectedPosition);  // 通知适配器更新当前选定项目
 
-                listener.onItemClick(music);
+                listener.onItemClick(music);  // 通知监听器用户选择了音乐
             }
         });
     }
@@ -69,6 +69,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         void onItemClick(MusicBaseModel music);
     }
 
+    // ViewHolder类，用于绑定视图
     public static class MusicViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView;
         TextView artistTextView;

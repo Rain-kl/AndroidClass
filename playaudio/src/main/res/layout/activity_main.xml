@@ -54,11 +54,12 @@
         android:layout_weight="1"
         android:padding="16dp"/>
 
-    <!-- 使用空间来填充中间间距 -->
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+
+<!--    &lt;!&ndash; 使用空间来填充中间间距 &ndash;&gt;-->
+<!--    <Space-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"/>-->
 
     <LinearLayout
         android:id="@+id/music_player_layout"
