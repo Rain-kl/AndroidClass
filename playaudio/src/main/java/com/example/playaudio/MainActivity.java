@@ -6,10 +6,11 @@ import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,8 +20,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -101,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViewById(R.id.btn_scan_music).setOnClickListener(this);
         findViewById(R.id.btn_search_music).setOnClickListener(this);
+        ImageButton musicControl = findViewById(R.id.music_control);
+        TextView songTitle = findViewById(R.id.song_title);
+        TextView artist = findViewById(R.id.artist);
 
         // 获取存储的URI，如果没有存储的URI，则显示扫描音乐按钮
         preferences = getSharedPreferences("config", MODE_PRIVATE);
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
 //                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
                 RecyclerView recyclerView = findViewById(R.id.music_recycler_view);
-                MusicHandler musicHandler = new MusicHandler(this, recyclerView);  // 创建音乐处理器
+                MusicHandler musicHandler = new MusicHandler(this, recyclerView,musicControl,songTitle,artist);  // 创建音乐处理器
                 musicHandler.loadMusicFiles(authorizedUri);  // 加载音乐文件
             } catch (IOException e) {
                 throw new RuntimeException(e);

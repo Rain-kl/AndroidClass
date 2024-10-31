@@ -18,7 +18,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
     private final List<MusicBaseModel> musicList;
     private final OnItemClickListener listener;
-    private int selectedPosition = RecyclerView.NO_POSITION; // 默认没有选择
+    private int selectedPosition = RecyclerView.NO_POSITION;// 默认没有选择
 
     public MusicAdapter(List<MusicBaseModel> musicList, OnItemClickListener listener) {
         this.musicList = musicList;
@@ -76,8 +76,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
         MusicViewHolder(View itemView) {
             super(itemView);
-            titleTextView = itemView.findViewById(R.id.song_title);
-            artistTextView = itemView.findViewById(R.id.artist);
+            titleTextView = itemView.findViewById(R.id.song_title_1);
+            artistTextView = itemView.findViewById(R.id.artist_1);
         }
     }
 }

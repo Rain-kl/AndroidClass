@@ -17,7 +17,6 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="TODO"
             android:src="@drawable/ic_menu" />
 
         <TextView
@@ -89,19 +88,22 @@
                 android:layout_height="wrap_content"
                 android:text="@string/music_player"
                 android:textSize="16sp"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:id="@+id/song_title"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/hi"
                 android:textSize="14sp"
-                android:textColor="#888888" />
+                android:textColor="#888888"
+                android:id="@+id/artist"/>
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+        <ImageButton
+            android:id="@+id/music_control"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_play" />
 
         <ImageView

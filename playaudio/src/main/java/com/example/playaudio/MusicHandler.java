@@ -7,6 +7,8 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.documentfile.provider.DocumentFile;
@@ -25,11 +27,17 @@ public class MusicHandler {
     private final List<MusicBaseModel> musicList = new ArrayList<>();
     private final RecyclerView recyclerView;
     private MediaPlayer mediaPlayer;
-    private MusicBaseModel currentlyPlayingMusic;
+    private final ImageButton musicControl;
+    private boolean isPlaying = false;
+    private final TextView songTitle;
+    private final TextView artist;
 
-    public MusicHandler(Context context, RecyclerView recyclerView) {
+    public MusicHandler(Context context, RecyclerView recyclerView, ImageButton musicControl, TextView songTitle, TextView artist) {
         this.context = context;
         this.recyclerView = recyclerView;
+        this.musicControl = musicControl;
+        this.songTitle = songTitle;
+        this.artist = artist;
     }
 
     @SuppressWarnings("resource")
@@ -86,11 +94,15 @@ public class MusicHandler {
         MusicAdapter musicAdapter = new MusicAdapter(musicList, this::playMusic);
         // 设置适配器
         recyclerView.setAdapter(musicAdapter);
+        musicControl.setOnClickListener(view -> togglePlayback()
+        );
     }
 
     public void playMusic(MusicBaseModel music) {
         Log.d("MusicUri", "Music Uri: " + music.getUri().toString());
         Toast.makeText(context, "You clicked on: " + music.getTitle(), Toast.LENGTH_SHORT).show();
+        songTitle.setText(music.getTitle());
+        artist.setText(music.getArtist());
 
 
         // 如果有音乐正在播放，则释放MediaPlayer
@@ -113,7 +125,8 @@ public class MusicHandler {
                 fileDescriptor.close();
 
                 // 设置监听器, 当准备好时开始播放
-                mediaPlayer.setOnPreparedListener(MediaPlayer::start);  //使用lambda表达式，当准备好时开始播放
+                mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+                musicControl.setImageResource(R.drawable.ic_pause);//使用lambda表达式，当准备好时开始播放
                 mediaPlayer.setOnCompletionListener(mp -> {
                     mp.release();
                     Toast.makeText(context, "Playback completed", Toast.LENGTH_SHORT).show();
@@ -125,11 +138,26 @@ public class MusicHandler {
                 });
 
                 mediaPlayer.prepareAsync();
-                currentlyPlayingMusic = music;
             }
         } catch (IOException e) {
             Toast.makeText(context, "Unable to play music", Toast.LENGTH_SHORT).show();
             Log.e("Error", "IOException while trying to play music: " + e.getMessage());
+        }
+    }
+
+    private void togglePlayback() {
+        if (mediaPlayer != null) {
+            if (isPlaying) {
+                // 如果当前是播放状态，则设置为暂停状态
+                mediaPlayer.pause();
+                musicControl.setImageResource(R.drawable.ic_play);
+                isPlaying = false;
+            } else {
+                // 如果当前是暂停状态，则设置为播放状态
+                mediaPlayer.start();
+                musicControl.setImageResource(R.drawable.ic_pause);
+                isPlaying = true;
+            }
         }
     }
 
