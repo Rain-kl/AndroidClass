@@ -31,13 +31,19 @@ public class MusicHandler {
     private boolean isPlaying = false;
     private final TextView songTitle;
     private final TextView artist;
+    private final ImageButton musicNext;
+    private int currentSongIndex;
+    private OnSongChangeListener onSongChangeListener;
 
-    public MusicHandler(Context context, RecyclerView recyclerView, ImageButton musicControl, TextView songTitle, TextView artist) {
+    public MusicHandler(Context context, RecyclerView recyclerView,
+                        ImageButton musicControl, TextView songTitle,
+                        TextView artist, ImageButton musicNext) {
         this.context = context;
         this.recyclerView = recyclerView;
         this.musicControl = musicControl;
         this.songTitle = songTitle;
         this.artist = artist;
+        this.musicNext = musicNext;
     }
 
     @SuppressWarnings("resource")
@@ -94,8 +100,15 @@ public class MusicHandler {
         MusicAdapter musicAdapter = new MusicAdapter(musicList, this::playMusic);
         // 设置适配器
         recyclerView.setAdapter(musicAdapter);
-        musicControl.setOnClickListener(view -> togglePlayback()
-        );
+        togglePlayback();
+        musicControl.setOnClickListener(view -> togglePlayback());
+        musicNext.setOnClickListener(view -> {
+            try {
+                playNext();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void playMusic(MusicBaseModel music) {
@@ -161,4 +174,39 @@ public class MusicHandler {
         }
     }
 
+    public void playNext() throws IOException {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+
+        // 增加当前播放的歌曲索引
+        currentSongIndex++;
+
+        // 检查是否超出音乐列表范围
+        if (currentSongIndex >= musicList.size()) {
+            currentSongIndex = 0; // 循环播放，回到第一首
+        }
+
+        // 获取当前歌曲的 URI
+        Uri uri = musicList.get(currentSongIndex).getUri();
+
+        // 重新创建 MediaPlayer 实例
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setDataSource(context, uri);
+        mediaPlayer.prepare();
+        mediaPlayer.start();
+
+        Log.d("MusicApp", "Playing song at index " + currentSongIndex);
+
+        // 通知歌曲改变
+        if (onSongChangeListener != null) {
+            onSongChangeListener.onSongChange(currentSongIndex);
+        }
+    }
+
+    public interface OnSongChangeListener {
+        void onSongChange(int index);
+    }
 }

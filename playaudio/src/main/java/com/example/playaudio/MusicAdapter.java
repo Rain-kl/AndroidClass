@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,12 +12,11 @@ import com.example.playaudio.model.MusicBaseModel;
 
 import java.util.List;
 
-
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
 
     private final List<MusicBaseModel> musicList;
     private final OnItemClickListener listener;
-    private int selectedPosition = RecyclerView.NO_POSITION;// 默认没有选择
+    private int selectedPosition = RecyclerView.NO_POSITION; // 默认没有选择
 
     public MusicAdapter(List<MusicBaseModel> musicList, OnItemClickListener listener) {
         this.musicList = musicList;
@@ -67,6 +65,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
     public interface OnItemClickListener {
         void onItemClick(MusicBaseModel music);
+    }
+
+    // 更新选中的项
+    public void setSelectedPosition(int position) {
+        int previousPosition = selectedPosition;
+        selectedPosition = position;
+
+        notifyItemChanged(previousPosition);  // 通知适配器更新前一个选定项目
+        notifyItemChanged(selectedPosition);  // 通知适配器更新当前选定项目
     }
 
     // ViewHolder类，用于绑定视图

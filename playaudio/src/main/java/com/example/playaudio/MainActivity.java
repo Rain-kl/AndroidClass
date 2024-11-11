@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageButton musicControl = findViewById(R.id.music_control);
         TextView songTitle = findViewById(R.id.song_title);
         TextView artist = findViewById(R.id.artist);
+        ImageButton musicNext = findViewById(R.id.music_next);
 
         // 获取存储的URI，如果没有存储的URI，则显示扫描音乐按钮
         preferences = getSharedPreferences("config", MODE_PRIVATE);
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
 //                Log.d("MainActivity", "Loading music files from: " + authorizedUri.toString());
                 RecyclerView recyclerView = findViewById(R.id.music_recycler_view);
-                MusicHandler musicHandler = new MusicHandler(this, recyclerView,musicControl,songTitle,artist);  // 创建音乐处理器
+                MusicHandler musicHandler = new MusicHandler(this, recyclerView,musicControl,songTitle,artist,musicNext);  // 创建音乐处理器
                 musicHandler.loadMusicFiles(authorizedUri);  // 加载音乐文件
             } catch (IOException e) {
                 throw new RuntimeException(e);

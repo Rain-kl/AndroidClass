@@ -8,4 +8,5 @@
     <string name="search_music">搜索音乐</string>
     <string name="song_title">Song Title</string>
     <string name="artist">Artist</string>
+    <string name="todo">TODO</string>
 </resources>
